@@ -3,28 +3,29 @@
 participant "Client" as client
 participant "Authorisation Server" as authorisation_server
 participant "Resource Owner" as resource_owner
+participant "Resource Server" as resource_server
 
 client -> resource_owner: Authorization Request
 resource_owner --> client: Authorization Grant
 
-client -> authorisation_server: Authorization Grant
+client -> authorisation_server: **Endpoint: /authorisation** \n Authorization Grant
 authorisation_server -> client: Access Token and Refresh Token
 
 alt Access Token Valid
 
-client -> resource_owner: Resource Request with Access Token
-resource_owner -> client: Resource
+client -> resource_server: Resource Request with Access Token
+resource_server -> client: Resource
 
 else Access Token Invalid
 
-client -> resource_owner: Resource Request with Access Token
-resource_owner -> client: Invalid Token Error
+client -> resource_server: Resource Request with Access Token
+resource_server -> client: Invalid Token Error
 
-client -> authorisation_server: Refresh Token
+client -> authorisation_server: **Endpoint: /token** \n Refresh Token
 authorisation_server -> client: Access Token and Optional Refresh Token
 
-client -> resource_owner: Resource Request with Access Token
-resource_owner -> client: Resource
+client -> resource_server: Resource Request with Access Token
+resource_server -> client: Resource
 
 end
 
