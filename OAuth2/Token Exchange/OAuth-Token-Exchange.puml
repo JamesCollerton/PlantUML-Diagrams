@@ -1,0 +1,21 @@
+@startuml
+
+participant "Client" as client
+participant "Authorisation Server A" as authorisation_server_a
+participant "Authorisation Server B" as authorisation_server_b
+
+client -> authorisation_server_a: Retrieves token for A
+authorisation_server_a -> client: Issues token for A
+client -> authorisation_server_b: **Endpoint: /token:** \n Makes request for token from B, request \n includes token for A 
+authorisation_server_b -> authorisation_server_b: Authorisation server validates \n the A token
+alt token valid
+opt 
+authorisation_server_b -> authorisation_server_a: Authorisation server makes \n any required requests to \n decode the A token and \n access the user information.
+end
+authorisation_server_b -> authorisation_server_b: Authorisation server \n extracts A token \n information to form \n B token.
+authorisation_server_b -> client: Returns B token
+else token invalid
+authorisation_server_b -> client: Returns invalid response
+end
+
+@enduml
