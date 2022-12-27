@@ -1,0 +1,17 @@
+@startuml
+
+box User Device
+participant "Client App" as client_app
+participant "Browser" as browser
+end box
+
+participant "Authorisation Server" as authorisation_server
+
+client_app -> browser: Authorisation request
+browser -> authorisation_server: **Endpoint: /authorise:** Authorisation request
+authorisation_server -> browser: Authorisation code
+browser -> client_app: Authorisation code
+client_app -> authorisation_server: **Endpoint: /token:** \n Authorisation code
+authorisation_server -> client_app: Access and optional refresh token
+
+@enduml
