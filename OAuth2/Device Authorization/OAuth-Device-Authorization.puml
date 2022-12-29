@@ -1,0 +1,16 @@
+@startuml
+
+participant "Device Client" as device_client
+participant "End User at Browser" as end_user
+participant "Authorisation Server" as authorisation_server
+
+device_client -> authorisation_server: **Endpoint: /device_authorization:** Sends client Id
+authorisation_server -> device_client: Returns device code, user code and verification URI
+device_client -> authorisation_server: **Endpoint: /token:** \n Polls with device code and client Id
+activate authorisation_server
+device_client -> end_user: Communicates the user code and verification URI
+end_user -> authorisation_server: Authenticates and authorises device
+authorisation_server -> device_client: Returns access token and optional refresh token from polling
+deactivate authorisation_server
+
+@enduml
