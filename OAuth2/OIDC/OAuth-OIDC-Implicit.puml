@@ -1,0 +1,11 @@
+@startuml
+
+participant "Relying Party" as relying_party
+participant "Open ID Provider \n Authorization Server" as open_id_provider
+participant "End User" as end_user
+
+relying_party -> open_id_provider: **Endpoint: /authorize:** Sends authorization request as \n with OAuth2.0 with OIDC scope
+open_id_provider -> end_user: Authenticates and asks for \n authorisation from
+open_id_provider -> relying_party: Sends ID token
+
+@enduml
