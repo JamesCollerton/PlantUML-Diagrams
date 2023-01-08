@@ -4,8 +4,10 @@ participant "Relying Party" as relying_party
 participant "Open ID Provider \n Authorization Server" as open_id_provider
 participant "End User" as end_user
 
-relying_party -> open_id_provider: **Endpoint: /authorize:** Sends authorization request as \n with OAuth2.0 with OIDC scope
+relying_party -> open_id_provider: **Endpoint: /authorize:** Sends authorization request as \n with OAuth2.0 with OIDC scope, with a response type \n specified.
 open_id_provider -> end_user: Authenticates and asks for \n authorisation from
-open_id_provider -> relying_party: Sends ID token
+open_id_provider -> relying_party: Sends authorisation code, and optionally multiple \n other tokens depending on the response type \n specified in the initial step.
+relying_party -> open_id_provider: **Endpoint: /token:** Sends authorization code
+open_id_provider -> relying_party: Returns ID token, access token and optionally refresh token
 
 @enduml

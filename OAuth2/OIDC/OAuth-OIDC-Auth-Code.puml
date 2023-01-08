@@ -8,6 +8,6 @@ relying_party -> open_id_provider: **Endpoint: /authorize:** Sends authorization
 open_id_provider -> end_user: Authenticates and asks for \n authorisation from
 open_id_provider -> relying_party: Sends authorisation code
 relying_party -> open_id_provider: **Endpoint: /token:** Sends authorization code
-open_id_provider -> relying_party: Returns ID token and access token
+open_id_provider -> relying_party: Returns ID token, access token and optionally refresh token
 
 @enduml
