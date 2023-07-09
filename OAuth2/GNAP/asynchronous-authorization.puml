@@ -1,0 +1,20 @@
+@startuml
+
+Participant "Client Instance" as client_instance
+Participant "Authorization Server" as authorization_server
+Participant "Resource Owner" as resource_owner
+
+client_instance -> authorization_server: Requests access to resources \n indicating it has no method of \n interacting. It optionally signals \n which resource owner it requires \n authorization from.
+authorization_server -> client_instance: Responds with information \n required to continue the request.
+note over authorization_server: Associates the continue information \n with the ongoing request for access \n and makes a decision on which \n resource owner to contact
+client_instance -> authorization_server: Begins polling the continuation \n endpoint to find out when the \n interaction has been completed.
+authorization_server -> client_instance: Returns polling response \n which can optionally \n update the continue \n information supplied \n previously
+note over client_instance: Optionally updates continue \n information if required
+authorization_server -> resource_owner: Reaches out to resource \n owner for authentication.
+resource_owner -> authorization_server: Authenticates with the \n authorization server
+authorization_server -> resource_owner: Reaches out to resource \n owner for authorization.
+resource_owner -> authorization_server: Authorizes request
+client_instance -> authorization_server: Successfully polls the continuation endpoint
+authorization_server -> client_instance: Returns access tokens!
+
+@enduml

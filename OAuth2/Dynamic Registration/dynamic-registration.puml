@@ -1,0 +1,13 @@
+@startuml
+
+participant "(Optional) Token \n Provider" as optional_token_provider
+participant "(Optional) Software \n Statement Provider" as optional_software_statement_provider
+participant "Client or Developer" as client_or_developer
+participant "Client Registration Endpoint" as client_registration_endpoint
+
+optional_token_provider -> client_or_developer: (Optional) Initial access token 
+optional_software_statement_provider -> client_or_developer: (Optional) Initial software statement
+client_or_developer -> client_registration_endpoint: Client registration request
+client_registration_endpoint -> client_or_developer: Client registration response
+
+@enduml

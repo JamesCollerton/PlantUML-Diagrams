@@ -1,0 +1,37 @@
+@startuml
+
+Participant "End User" as end_user
+Participant "Client Instance" as client_instance
+Participant "Authorization Server" as authorization_server
+Participant "Resource Server" as resource_server
+Participant "Resource Owner" as resource_owner
+
+end_user -> client_instance: The end user goes to the \n client instance and makes \n a request for resources on \n behalf of the resource owner. \n The end user and resource \n owner could be, but aren't guaranteed \n to be, the same entity.
+Note over client_instance: The client instance decides \n what access is needed and \n which authorization server \n to talk to.
+client_instance -> authorization_server: Client instance makes \n appropriate request \n to authorization server.
+note over authorization_server: The authorization server \n processes the request \n and decides what interaction \n is needed.
+authorization_server -> client_instance: The authorization server \n sends a response
+authorization_server -> resource_owner: If we require interaction the authorization \n server interacts with the resource owner. \n Remember, the resource owner could \n easily be the end user, so in reality this \n could mean the authorization server \n using the client instance to interact with \n the end user.
+client_instance -> authorization_server: The client continues the grant \n at the authorization server. This \n could be due to a change in polling \n response, or because the client has \n the capability to receive a message \n from the authorization server.
+authorization_server -> client_instance: If access has been granted then \n an access token and information \n on the resource owner is returned.
+client_instance -> resource_server: The client instance uses the access token to retrieve resources \n from the resource owner.
+note over resource_server: The resource server decides if the \n access token is sufficient to have \n access to its resources.
+
+opt Access token valid
+
+resource_server -> client_instance: Resource server returns the requested resources
+
+note over client_instance: Client continues to use the \n access token until it becomes \n invalid or the client no longer \n needs it.
+
+else Access token invalid
+
+resource_server -> client_instance: Resource server returns an error response
+client_instance -> authorization_server: Client instance requests to rotate the \n access token
+authorization_server -> client_instance: Authorization server returns new access \n token with same rights
+
+note over client_instance: Client continues making requests
+
+end
+
+note over client_instance: Client disposes of the token when it's done!
+@enduml

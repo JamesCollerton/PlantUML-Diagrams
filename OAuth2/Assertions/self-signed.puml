@@ -1,0 +1,11 @@
+@startuml
+
+participant "Authorization Server" as authorization_server
+participant "Client" as client
+
+note over client: Create assertion, signing \n using keys proving \n the client has access to \n client secrets
+client -> authorization_server: Send assertion
+note over authorization_server: Checks assertion \n subject is client Id \n and validates signature
+authorization_server -> client: Success/ failure
+
+@enduml

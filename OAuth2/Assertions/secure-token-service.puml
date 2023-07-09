@@ -1,0 +1,20 @@
+@startuml
+
+participant "Authorization Server" as authorization_server
+participant "Client" as client
+participant "Token Service" as token_service
+
+client -> token_service: Request assertion
+note over token_service: Integrity protect assertion
+token_service -> client: Return assertion
+client -> authorization_server: **Endpoint: /token:** \n Send assertion
+note over authorization_server: Does checks defined above
+alt
+    authorization_server -> token_service: Checks integrity of assertion
+    token_service -> authorization_server: Returns integrity check result
+else
+    note over authorization_server: Checks integrity of assertion some other way
+end
+authorization_server -> client: Returns tokens/ error message
+
+@enduml

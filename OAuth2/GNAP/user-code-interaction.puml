@@ -1,0 +1,22 @@
+@startuml
+
+Participant "End User/ Resource Owner" as end_user_resource_owner
+Participant "Client Instance" as client_instance
+Participant "Authorization Server" as authorization_server
+
+client_instance -> authorization_server: Requests access, also indicating \n it can display a user code.
+authorization_server -> client_instance: Responds with user code \n and information client will \n require to continue the request.
+note over authorization_server: Associates the continue information \n with the ongoing request for access.
+note over client_instance: Stores continue information \n for later use.
+client_instance -> end_user_resource_owner: Displays the user code \n supplied by the authorization \n server.
+client_instance -> authorization_server: Begins polling the continuation \n endpoint to find out when the \n interaction has been completed.
+authorization_server -> client_instance: Returns polling response \n which can optionally \n update the continue \n information supplied \n previously
+note over client_instance: Optionally updates continue \n information if required
+note over end_user_resource_owner: Opens browser and \n enters a URI where \n they can put their code. \n How this URI is communicated \n is not defined in the protocol.
+end_user_resource_owner -> authorization_server: Authenticates with the authorization server
+end_user_resource_owner -> authorization_server: Enters the user code
+end_user_resource_owner -> authorization_server: Authorizes the pending request for access
+client_instance -> authorization_server: Successfully polls the continuation endpoint
+authorization_server -> client_instance: Returns access tokens!
+
+@enduml

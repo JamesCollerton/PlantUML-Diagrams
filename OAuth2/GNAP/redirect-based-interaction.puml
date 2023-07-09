@@ -1,0 +1,23 @@
+@startuml
+
+Participant "End User/ Resource Owner" as end_user_resource_owner
+Participant "Client Instance (Web Browser)" as client_instance
+Participant "Authorization Server" as authorization_server
+Participant "Resource Server" as resource_server
+
+end_user_resource_owner -> client_instance: Begins the grant's journey
+note over client_instance: Begins a session belonging \n to the end user. Employed \n for storing information \n about their progress.
+client_instance -> authorization_server: As before, the client instance \n requests access, also indicating \n it can carry out redirects. It provides \n a URI the authorization server can \n redirect to when the interaction is \n finished.
+note over client_instance: Stores information associated \n with the redirect supplied to \n the authorization server in \n session so that when we arrive \n back there the client instance \n can verify it.
+authorization_server -> client_instance: Responds with a URI to \n redirect to in order to carry \n out the interaction, information \n that should be sent when we \n finalise the interaction to consider \n it closed, and information on how \n the client can continue the request \n once the interaction has finished.
+note over client_instance: Stores verificaton and \n continuation information \n supplied by authorization server
+client_instance -> end_user_resource_owner: Redirects to the interaction URI
+note over end_user_resource_owner: Loads interaction URI
+end_user_resource_owner -> authorization_server: Carries out any **authentication** required from the interaction
+end_user_resource_owner -> authorization_server: Carries out any **authorization** required from the interaction
+authorization_server-> client_instance: Redirects back to the URI \n provided by the client in \n the first stages along with \n a hash of the verification \n information it supplied.
+note over client_instance: Verifies that the hash \n supplied by the authorization \n server matches the hash of \n the verification information \n supplied to it when the original \n redirect URI was provided.
+client_instance -> authorization_server: Loads the continue information \n supplied previously by the \n authorization server and uses \n it along with a reference to the \n now completed interaction. Sends \n final continue request
+authorization_server -> client_instance: Returns access tokens and \n subject information!
+
+@enduml
