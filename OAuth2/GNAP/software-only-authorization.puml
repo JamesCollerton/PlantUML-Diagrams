@@ -1,0 +1,10 @@
+@startuml
+
+Participant "Client Instance" as client_instance
+Participant "Authorization Server" as authorization_server
+
+client_instance -> authorization_server: Requests access, sending \n no interaction modes, but \n providing client identification \n information.
+note over authorization_server: Determines request authorized \n using client identification \n information
+authorization_server -> client_instance: Returns access tokens!
+
+@enduml
