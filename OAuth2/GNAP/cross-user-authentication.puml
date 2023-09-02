@@ -1,0 +1,18 @@
+@startuml
+
+Participant "End User" as end_user
+Participant "Client Instance" as client_instance
+Participant "Authorization Server" as authorization_server
+Participant "Resource Owner" as resource_owner
+
+resource_owner -> end_user: (Outside of protocol) Communicates a human-readable ID \n such as email address
+end_user -> client_instance: (Outside of protocol) \n Sends human-readable Id
+client_instance -> authorization_server: Requests access to resource owner's \n subject information with \n human-readable Id. Included in this \n request is information on how the \n authorization server can indicate to \n the client instance it is ready to \n provide subject information.
+authorization_server -> client_instance: Response including how the client can \n continue their flow once the authorization \n server has indicated it has finished.
+resource_owner -> authorization_server: Authorizes and authenticates
+resource_owner -> authorization_server: Approves the end user's \n access request
+authorization_server -> client_instance: Sends finish message to the endpoint \n provided previously
+client_instance -> authorization_server: Sends continue request to endpoint \n provided previously
+authorization_server -> client_instance: Returns the resource owner's subject \n information.
+
+@enduml

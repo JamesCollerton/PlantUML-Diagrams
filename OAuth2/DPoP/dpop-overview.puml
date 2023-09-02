@@ -1,0 +1,36 @@
+@startuml
+
+participant "Client" as client
+participant "Authorization Server" as authorization_server
+participant "Resource Server" as resource_server
+
+opt Client using authorization code flow and \nwants to bind code to DPoP header
+    client -> authorization_server: **/authorize endpoint** Carries out regular flow \nbut in the authorisation code request sends an \nextra parameter, the DPoP JKT, which contains \nclient public key information.
+    note over authorization_server: Binds authorization code \nto client's public key
+    authorization_server -> client: Returns authorization code bound to DPoP \nJKT
+end
+client -> authorization_server: **/token endpoint** Sends authorization grant \n(e.g. authorization code, refresh token) attaching \nDPoP proof as an HTTP header
+opt Authorization server requires nonce
+    authorization_server -> client: Authorization server returns error message \nand valid nonce for client to use
+    note over client: Adds nonce to DPoP JWT
+    client -> authorization_server: **/token endpoint** Sends same grant as before, \nbut DPoP JWT now contains the valid nonce
+end
+note over authorization_server: The authorization server creates and \nsender-constrains an access token \n(and a refresh token if it is issued) \nmeaning it can't be used without the \nprivate key
+authorization_server -> client: Returns tokens with token_type=DPoP
+client -> resource_server: **/token endpoint** Sends request with access \ntoken and DPoP header
+opt Access token is opaque
+    resource_server -> authorization_server: Sends access token to \nintrospection endpoint
+    authorization_server -> resource_server: Returns public key information
+end
+
+note over resource_server: Resource server uses public key \nin token to verify DPoP header
+
+opt Resource server requires nonce
+    resource_server -> client: Returns error informing client needs nonce, client returns to start
+else DPoP header invalid for other reason
+    resource_server -> client: Returns error 
+else DPoP header valid
+    resource_server -> client: Returns protected resource
+end
+
+@enduml

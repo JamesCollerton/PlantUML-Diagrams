@@ -1,0 +1,14 @@
+@startuml
+
+Participant "Client Instance" as client_instance
+Participant "Authorization Server" as authorization_server
+Participant "Resource Server" as resource_server
+
+client_instance -> authorization_server: Requests access token
+authorization_server -> client_instance: Returns token with a \n token management URI
+client_instance -> resource_server: Makes request with existing access token
+note over resource_server: Sees access token is expired
+resource_server -> client_instance: Returns error response
+client_instance -> authorization_server: Refresh token request \n to management URI \n with client key \n and access token
+authorization_server -> client_instance: Returns a new access \n token and token \n management information
+@enduml

@@ -1,0 +1,15 @@
+@startuml
+
+Participant "Client Instance" as client_instance
+Participant "Authorization Server" as authorization_server
+Participant "End User/ Resource Owner" as end_user_resource_owner
+
+client_instance -> authorization_server: Requests access to \n subject information
+authorization_server -> client_instance: Indicates an interaction is needed
+client_instance -> end_user_resource_owner: Facilitates interaction
+end_user_resource_owner -> authorization_server: Authenticates and authorizes
+end_user_resource_owner -> client_instance: Signals to continue
+client_instance -> authorization_server: Continues
+authorization_server -> client_instance: Grants access
+
+@enduml
