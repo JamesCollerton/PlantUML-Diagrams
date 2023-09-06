@@ -4,10 +4,12 @@ participant "Client" as client
 participant "Authorization Server" as authorization_server
 participant "Resource Server" as resource_server
 
+note over client: Creates DPoP Proof JWT
+
 opt Client using authorization code flow and \nwants to bind code to DPoP header
-    client -> authorization_server: **/authorize endpoint** Carries out regular flow \nbut in the authorisation code request sends an \nextra parameter, the DPoP JKT, which contains \nclient public key information.
-    note over authorization_server: Binds authorization code \nto client's public key
-    authorization_server -> client: Returns authorization code bound to DPoP \nJKT
+    client -> authorization_server: **/authorize endpoint** Carries out regular flow \nbut in the authorisation code request sends an \nextra parameter, the DPoP JKT, which contains \nclient public key information. Also sends DPoP \nproof in header
+    note over authorization_server: Verifies DPoP JKT against \npublic key information in \nDPoP header.
+    authorization_server -> client: Returns authorization code
 end
 client -> authorization_server: **/token endpoint** Sends authorization grant \n(e.g. authorization code, refresh token) attaching \nDPoP proof as an HTTP header
 opt Authorization server requires nonce
@@ -17,7 +19,7 @@ opt Authorization server requires nonce
 end
 note over authorization_server: The authorization server creates and \nsender-constrains an access token \n(and a refresh token if it is issued) \nmeaning it can't be used without the \nprivate key
 authorization_server -> client: Returns tokens with token_type=DPoP
-client -> resource_server: **/token endpoint** Sends request with access \ntoken and DPoP header
+client -> resource_server: Sends request with access token and DPoP header
 opt Access token is opaque
     resource_server -> authorization_server: Sends access token to \nintrospection endpoint
     authorization_server -> resource_server: Returns public key information
