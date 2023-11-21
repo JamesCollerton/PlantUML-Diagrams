@@ -1,0 +1,18 @@
+@startuml
+
+participant "First Party Native App" as first_party_native_app
+participant "Authorisation Server" as authorisation_server
+
+note over first_party_native_app: Begins flow
+group Potentially repeated
+    first_party_native_app -> authorisation_server: **Endpoint: /authorization_challenge endpoint:** \nAuthorization challenge request
+    authorisation_server -> first_party_native_app: Returns error response
+    note over first_party_native_app: Decides if it can collect \nmore information to be \nsuccessful
+    ...
+end
+first_party_native_app -> authorisation_server: **Endpoint: /authorization_challenge endpoint:** \nAuthorization challenge request
+authorisation_server -> first_party_native_app: Returns authorization code
+first_party_native_app -> authorisation_server: **Endpoint: /token endpoint:** \nToken request with authorization code
+authorisation_server -> first_party_native_app: Token response
+
+@enduml
