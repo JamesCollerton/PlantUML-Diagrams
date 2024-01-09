@@ -1,0 +1,19 @@
+@startuml
+
+participant "Play Server" as play_server
+participant "App Backend Server" as app_backend_server
+box "First Party Native Application"
+    participant "Application Code" as application_code
+    participant "Integrity API" as integrity_api
+end box
+
+application_code -> integrity_api: Request to prepare integrity token
+integrity_api -> application_code: Returns integrity token provider
+application_code -> integrity_api: Requests integrity token
+integrity_api -> application_code: Returns integrity token
+application_code -> app_backend_server: Sends integrity token
+app_backend_server -> play_server: Forwards integrity token
+play_server -> app_backend_server: Returns integrity judgement
+note over app_backend_server: Makes judgement on app identity
+
+@enduml

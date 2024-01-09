@@ -1,0 +1,38 @@
+@startuml
+
+!pragma teoz true
+participant "User" as user
+box "Client Device" #White
+    participant "User Agent" as user_agent
+    participant "Relying Party Client" as relying_party_client
+end box
+participant "Authenticator" as authenticator
+participant "Relying Party Server" as relying_party_server
+
+group Registration
+    note over user: Tries to register \nan account
+    user -> user_agent: <back:white>Asks to create \n<back:white>an account on \n<back:white>a site
+    user_agent -> relying_party_client: <back:white>Asks to create an account
+    relying_party_client -> authenticator: <back:white>Asks to create an account
+    authenticator -> user: <back:white>Facilitates user providing biometric or other authorization
+    user -> authenticator: <back:white>Provides necessary authorization
+    note over authenticator: Generate a public/ private \nkey pair. The public key is \nattested, helping the relying \nparty know it came from a \nvalid source. It is also scoped \nto the correct site, so can't \nbe used elsewhere. Stores \nprivate key securely
+    authenticator -> relying_party_client: <back:white>Sends over public key
+    relying_party_client -> relying_party_server: <back:white>Sends over public key
+    note over relying_party_server: Verifies and stores \n public key 
+end
+
+group Authentication
+    note over user: Tries to authenticate.
+    user -> user_agent: <back:white>Asks to authenticate
+    user_agent -> relying_party_server: <back:white>Sends log in request
+    relying_party_server -> user_agent: <back:white>Returns challenge (enter biometric \n<back:white>details, security key etc.)
+    user_agent -> user: <back:white>Asks user to complete \n<back:white>challenge
+    user -> user_agent: <back:white>Completes challenge
+    user_agent -> relying_party_client: Asks to facilitate \nthe signing of the \nchallenge
+    relying_party_client <-> authenticator: <back:white>Retrieves private key \n<back:white> and signs challenge
+    relying_party_client -> relying_party_server: <back:white>Returns signed challenge
+    note over relying_party_server: Retrieves public key \n and checks the \n challenge signature \n verifies. If so, signs \n you in!
+end
+
+@enduml

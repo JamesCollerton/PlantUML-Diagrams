@@ -1,0 +1,34 @@
+@startuml
+
+participant "User" as user
+participant "First Party Application" as first_party_application
+participant "Authorization Server" as authorization_server
+participant "Resource Server" as resource_server
+
+user -> first_party_application: User requests authorization
+first_party_application -> user: Collects email address
+first_party_application -> authorization_server: **Endpoint: /authorization_challenge endpoint:** \nSends request with email address
+note over authorization_server: Sends a verification code to \nthe provided email address
+authorization_server -> first_party_application: Returns error response with auth session Id
+first_party_application -> user: Prompts user to enter \nverification code they\n were emailed
+note over user: Retrieves verification \ncode from email address
+user -> first_party_application: Enters verification code
+first_party_application -> authorization_server: **Endpoint: /authorization_challenge endpoint:** \nSends request with verification code and device \nsession Id
+authorization_server -> first_party_application: Returns authorization code
+first_party_application -> authorization_server: **Endpoint: /token:** Sends request with \nauthorization code
+authorization_server -> first_party_application: Returns access and refresh token. The access \ntoken has a low ACR embedded in it
+first_party_application -> resource_server: Requests protected resources using access token
+resource_server -> first_party_application: Returns insufficient user authentication error \ncode, along with the desired ACRs and max age
+first_party_application -> authorization_server: **Endpoint: /authorization_challenge endpoint:** \nSends request with auth session Id, ACRs and \nmax age
+note over authorization_server: Determines which authentication \nmethods can be used to satisfy \nACR. Settles on OTP.
+authorization_server -> first_party_application: Returns error response and custom error code \ninforming client that an OTP is required.
+first_party_application -> user: Prompts user for OTP
+user -> first_party_application: User enters OTP, in this \ncase from an authenticator \napp.
+first_party_application -> authorization_server: **Endpoint: /authorization_challenge endpoint:** \nSends request with OTP and device \nsession Id
+authorization_server -> first_party_application: Returns authorization code
+first_party_application -> authorization_server: **Endpoint: /token:** Sends request with \nauthorization code
+authorization_server -> first_party_application: Returns access and refresh token. The access \ntoken has a high ACR embedded in it
+first_party_application -> resource_server: Requests protected resources using access token
+resource_server -> first_party_application: Returns protected resource!
+
+@enduml

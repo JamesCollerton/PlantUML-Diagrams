@@ -1,0 +1,17 @@
+@startuml
+
+participant "Browser" as browser
+participant "Server" as server
+
+browser -> server: User authenticates via browser.
+note over server: Server generates session, \nstores session information.
+server -> browser: Sets cookie with session Id.
+...
+browser -> server: User requests web page to transfer \nmoney, request contains cookie \nwith session Id.
+note over server: Generates CSRF token \nand associates to \nsession Id
+server -> browser: Returns transfer form along with \nCSRF token
+note over browser: User enters transfer details
+browser -> server: Returns transfer form with token, request \ncontains cookie with session Id.
+note over server: Checks token is valid \nfor provided cookie
+
+@enduml
