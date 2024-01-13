@@ -3,35 +3,45 @@
 !pragma teoz true
 participant "User" as user
 box "Client Device" #White
-    participant "User Agent" as user_agent
-    participant "Relying Party Client" as relying_party_client
+    participant "WebAuthn Client \n(Conforming User Agent)" as webauthn_client
+    participant "Relying Party Script" as relying_party_script
+    ' participant "Relying Party Client" as webauthn_client
 end box
 participant "Authenticator" as authenticator
 participant "Relying Party Server" as relying_party_server
 
 group Registration
     note over user: Tries to register \nan account
-    user -> user_agent: <back:white>Asks to create \n<back:white>an account on \n<back:white>a site
-    user_agent -> relying_party_client: <back:white>Asks to create an account
-    relying_party_client -> authenticator: <back:white>Asks to create an account
+    user -> webauthn_client: <back:white>Asks to create \n<back:white>an account in \n<back:white>the relying party
+    webauthn_client -> relying_party_script: Script within the \nWebAuthn client is run
+    relying_party_script -> relying_party_server: Requests a challenge
+    note over relying_party_server: Stores challenge for \nuse later.
+    relying_party_server -> relying_party_script: Returns a challenge
+    relying_party_script -> webauthn_client: <back:white>Asks WebAuthn client \n<back:white>to create a passkey, \n<back:white>attaches challenge
+    webauthn_client -> authenticator: <back:white>Asks Authenticator to create \n<back:white>a passkey, attaches \n<back:white>challenge
     authenticator -> user: <back:white>Facilitates user providing biometric or other authorization
     user -> authenticator: <back:white>Provides necessary authorization
-    note over authenticator: Generate a public/ private \nkey pair. The public key is \nattested, helping the relying \nparty know it came from a \nvalid source. It is also scoped \nto the correct site, so can't \nbe used elsewhere. Stores \nprivate key securely
-    authenticator -> relying_party_client: <back:white>Sends over public key
-    relying_party_client -> relying_party_server: <back:white>Sends over public key
-    note over relying_party_server: Verifies and stores \n public key 
+    note over authenticator: Generate a public/ private \nkey pair (passkey). The \npublic key is scoped to \nthe correct site, so can't \nbe used elsewhere. Stores \nboth keys securely
+    authenticator -> webauthn_client: <back:white>Sends over public key with \n<back:white>attestation information around \n<back:white>the authenticator, includes the \n<back:white>challenge and client info.
+    webauthn_client -> relying_party_script: <back:white>Sends over public key with \n<back:white>attestation information around \n<back:white>the authenticator, includes the \n<back:white>challenge and client info.
+    relying_party_script -> relying_party_server: <back:white>Sends over public key with \n<back:white>attestation information around \n<back:white>the authenticator, includes the \n<back:white>challenge and client info.
+    note over relying_party_server: Verifies challenge, \nattestation information \nand scope. Stores public \nkey against credential Id.
 end
 
 group Authentication
     note over user: Tries to authenticate.
-    user -> user_agent: <back:white>Asks to authenticate
-    user_agent -> relying_party_server: <back:white>Sends log in request
-    relying_party_server -> user_agent: <back:white>Returns challenge (enter biometric \n<back:white>details, security key etc.)
-    user_agent -> user: <back:white>Asks user to complete \n<back:white>challenge
-    user -> user_agent: <back:white>Completes challenge
-    user_agent -> relying_party_client: Asks to facilitate \nthe signing of the \nchallenge
-    relying_party_client <-> authenticator: <back:white>Retrieves private key \n<back:white> and signs challenge
-    relying_party_client -> relying_party_server: <back:white>Returns signed challenge
+    user -> webauthn_client: <back:white>Asks to authenticate
+    webauthn_client -> relying_party_script: Triggers script \nfor authentication
+    relying_party_script -> relying_party_server: <back:white>Asks for user credential Id
+    relying_party_server -> relying_party_script: <back:white>Returns credential Id
+    relying_party_script -> webauthn_client: Asks to authenticate \nwith credential Id
+    webauthn_client -> authenticator: <back:white>Connects to \n<back:white>authenticator
+    authenticator -> user: <back:white>Facilitates user providing \n<back:white>biometric or other authorization
+    user -> authenticator: <back:white>Provides necessary authorization
+    note over authenticator: Retrieves private key \nand uses it to sign \nresponse
+    authenticator -> webauthn_client: <back:white>Returns signed \n<back:white>response
+    webauthn_client -> relying_party_script: <back:white>Returns signed \n<back:white>response
+    relying_party_script -> relying_party_server: <back:white>Returns signed \n<back:white>response
     note over relying_party_server: Retrieves public key \n and checks the \n challenge signature \n verifies. If so, signs \n you in!
 end
 
